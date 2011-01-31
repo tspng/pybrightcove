@@ -329,8 +329,8 @@ class Video(object):
             'tags': self.tags,
             'economics': self.economics,
             'id': self.id,
-            'end_date': _make_tstamp(self.end_date),
-            'start_date': _make_tstamp(self.start_date)}
+            'endDate': _make_tstamp(self.end_date),
+            'startDate': _make_tstamp(self.start_date)}
         if len(self.renditions) > 0:
             data['renditions'] = []
             for r in self.renditions:
@@ -579,7 +579,9 @@ class Video(object):
         if not isinstance(accounts, (list, tuple)):
             msg = "Video.share expects an iterable argument"
             raise exceptions.PyBrightcoveError(msg)
-        raise exceptions.PyBrightcoveError("Not yet implemented")
+        if len(accounts) > 0:
+            return self.connection.post('share_video', video_id=self.id,
+                auto_accept=True, sharee_account_ids=accounts)
 
     def set_image(self, image, filename=None, resize=False):
         """
