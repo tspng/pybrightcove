@@ -241,8 +241,7 @@ class RemoteAssetsDisabledError(BrightcoveError):
 
 
 class InvalidCountryCodeError(BrightcoveError):
-    description = """The following country codes are not supported for
-        geo-restriction:"""
+    description = """The following country codes are not supported for geo-restriction:"""
     cause = "You used an invalid country code for geo-restriction."
     code = 310
 
@@ -253,6 +252,10 @@ class GeoRestrictionDisabledError(BrightcoveError):
             but your account is not enabled for this feature."""
     code = 311
 
+class VideoStatusNotComplete(BrightcoveError):
+    description = "videos that do not have complete status cannot be shared"
+    cause = "video status is not complete"
+    code = 102
 
 ERROR_MAP = {}
 ERROR_MAP[100] = UnknownServerError
@@ -281,3 +284,4 @@ ERROR_MAP[308] = NonmatchingChecksumError
 ERROR_MAP[309] = RemoteAssetsDisabledError
 ERROR_MAP[310] = InvalidCountryCodeError
 ERROR_MAP[311] = GeoRestrictionDisabledError
+ERROR_MAP[312] = VideoStatusNotComplete

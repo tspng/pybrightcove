@@ -580,8 +580,11 @@ class Video(object):
             msg = "Video.share expects an iterable argument"
             raise exceptions.PyBrightcoveError(msg)
         if len(accounts) > 0:
-            return self.connection.post('share_video', video_id=self.id,
-                auto_accept=True, sharee_account_ids=accounts)
+            if self.get_upload_status() == enums.UploadStatusEnum.COMPLETE:
+                return self.connection.post('share_video', video_id=self.id,
+                    auto_accept=True, sharee_account_ids=accounts)
+            else:
+                raise VideoStatusNotComplete
 
     def set_image(self, image, filename=None, resize=False):
         """
