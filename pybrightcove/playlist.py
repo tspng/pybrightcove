@@ -32,7 +32,6 @@ VALID_PLAYLIST_TYPES = (pybrightcove.enums.PlaylistTypeEnum.EXPLICIT,
                         pybrightcove.enums.PlaylistTypeEnum.ALPHABETICAL,
                         pybrightcove.enums.PlaylistTypeEnum.PLAYS_TOTAL,
                         pybrightcove.enums.PlaylistTypeEnum.PLAYS_TRAILING_WEEK)
-                        
 
 class Playlist(object):
     """
@@ -42,7 +41,7 @@ class Playlist(object):
     # redefine type,id builtins - refactor later
     # pylint: disable=W0622
     def __init__(self, name=None, type=None, id=None, reference_id=None,
-        data=None, connection=None):
+        data=None, _connection=None):
         self.id = None
         self.reference_id = None
         self.account_id = None
@@ -55,7 +54,7 @@ class Playlist(object):
 
         self.raw_data = None
 
-        self.connection = connection
+        self.connection = _connection
         if not self.connection:
             self.connection = pybrightcove.connection.APIConnection()
 
@@ -143,7 +142,7 @@ class Playlist(object):
 
         for video in data.get('videos', []):
             self.videos.append(pybrightcove.video.Video(
-                data=video, connection=self.connection))
+                data=video, _connection=self.connection))
 
     def save(self):
         """
@@ -168,42 +167,42 @@ class Playlist(object):
             self.id = None
 
     @staticmethod
-    def find_all(connection=None, page_size=100, page_number=0,
+    def find_all(_connection=None, page_size=100, page_number=0,
         sort_by=DEFAULT_SORT_BY, sort_order=DEFAULT_SORT_ORDER):
         """
         List all playlists.
         """
         return pybrightcove.connection.ItemResultSet("find_all_playlists",
-            Playlist, connection, page_size, page_number, sort_by, sort_order)
+            Playlist, _connection, page_size, page_number, sort_by, sort_order)
 
     @staticmethod
-    def find_by_ids(ids, connection=None, page_size=100, page_number=0,
+    def find_by_ids(ids, _connection=None, page_size=100, page_number=0,
         sort_by=DEFAULT_SORT_BY, sort_order=DEFAULT_SORT_ORDER):
         """
         List playlists by specific IDs.
         """
         ids = ','.join([str(i) for i in ids])
         return pybrightcove.connection.ItemResultSet('find_playlists_by_ids',
-            Playlist, connection, page_size, page_number, sort_by, sort_order,
+            Playlist, _connection, page_size, page_number, sort_by, sort_order,
             playlist_ids=ids)
 
     @staticmethod
-    def find_by_reference_ids(reference_ids, connection=None, page_size=100,
+    def find_by_reference_ids(reference_ids, _connection=None, page_size=100,
         page_number=0, sort_by=DEFAULT_SORT_BY, sort_order=DEFAULT_SORT_ORDER):
         """
         List playlists by specific reference_ids.
         """
         reference_ids = ','.join([str(i) for i in reference_ids])
         return pybrightcove.connection.ItemResultSet(
-            "find_playlists_by_reference_ids", Playlist, connection, page_size,
+            "find_playlists_by_reference_ids", Playlist, _connection, page_size,
             page_number, sort_by, sort_order, reference_ids=reference_ids)
 
     @staticmethod
-    def find_for_player_id(player_id, connection=None, page_size=100,
+    def find_for_player_id(player_id, _connection=None, page_size=100,
         page_number=0, sort_by=DEFAULT_SORT_BY, sort_order=DEFAULT_SORT_ORDER):
         """
         List playlists for a for given player id.
         """
         return pybrightcove.connection.ItemResultSet(
-            "find_playlists_for_player_id", Playlist, connection, page_size,
+            "find_playlists_for_player_id", Playlist, _connection, page_size,
             page_number, sort_by, sort_order, player_id=player_id)
