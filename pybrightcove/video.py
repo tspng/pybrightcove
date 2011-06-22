@@ -657,10 +657,15 @@ class Video(object):
         filters = []
         if filter_list is not None:
             filters = filter_list
-        if not isinstance(since, datetime):
+        if isinstance(since, datetime):
+            fdate = int(since.strftime("%s")) / 60  ## Minutes since UNIX time
+        elif since == 0:
+            fdate = '0'  # This should be a string, otherwise kwargs
+                         # thinks it's not existent
+        else:
             msg = 'The parameter "since" must be a datetime object.'
             raise exceptions.PyBrightcoveError(msg)
-        fdate = int(since.strftime("%s")) / 60  ## Minutes since UNIX time
+
         return connection.ItemResultSet('find_modified_videos',
             Video, _connection, page_size, page_number, sort_by, sort_order,
             from_date=fdate, filter=filters)
