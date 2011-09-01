@@ -672,12 +672,15 @@ class Video(object):
 
     @staticmethod
     def find_all(_connection=None, page_size=100, page_number=0,
-        sort_by=enums.DEFAULT_SORT_BY, sort_order=enums.DEFAULT_SORT_ORDER):
+                 sort_by=enums.DEFAULT_SORT_BY,
+                 sort_order=enums.DEFAULT_SORT_ORDER,
+                 **kwargs
+                 ):
         """
         List all videos.
         """
         return connection.ItemResultSet('find_all_videos', Video,
-            _connection, page_size, page_number, sort_by, sort_order)
+            _connection, page_size, page_number, sort_by, sort_order, **kwargs)
 
     @staticmethod
     def find_by_tags(and_tags=None, or_tags=None, _connection=None,
@@ -741,7 +744,7 @@ class Video(object):
     @staticmethod
     def find_by_reference_ids(reference_ids, _connection=None, page_size=100,
         page_number=0, sort_by=enums.DEFAULT_SORT_BY,
-        sort_order=enums.DEFAULT_SORT_ORDER):
+        sort_order=enums.DEFAULT_SORT_ORDER, unfiltered=False):
         """
         List all videos identified by a list of reference ids
         """
@@ -749,13 +752,17 @@ class Video(object):
             err = "Video.find_by_reference_ids expects an iterable argument"
             raise exceptions.PyBrightcoveError(err)
         ids = ','.join(reference_ids)
+        apicall = 'find_videos_by_reference_ids'
+        if unfiltered:
+            apicall = 'find_videos_by_reference_ids_unfiltered'
         return connection.ItemResultSet(
-            'find_videos_by_reference_ids', Video, _connection, page_size,
+            apicall, Video, _connection, page_size,
             page_number, sort_by, sort_order, reference_ids=ids)
 
     @staticmethod
     def find_by_ids(ids, _connection=None, page_size=100, page_number=0,
-        sort_by=enums.DEFAULT_SORT_BY, sort_order=enums.DEFAULT_SORT_ORDER):
+        sort_by=enums.DEFAULT_SORT_BY, sort_order=enums.DEFAULT_SORT_ORDER,
+        unfiltered=False, **kwargs):
         """
         List all videos identified by a list of Brightcove video ids
         """
@@ -763,7 +770,10 @@ class Video(object):
             err = "Video.find_by_ids expects an iterable argument"
             raise exceptions.PyBrightcoveError(err)
         ids = ','.join([str(i) for i in ids])
-        return connection.ItemResultSet('find_videos_by_ids',
+        apicall = 'find_videos_by_ids'
+        if unfiltered:
+            apicall = 'find_videos_by_ids_unfiltered'
+        return connection.ItemResultSet(apicall,
             Video, _connection, page_size, page_number, sort_by, sort_order,
-            video_ids=ids)
+            video_ids=ids, **kwargs)
 
