@@ -743,8 +743,9 @@ class Video(object):
 
     @staticmethod
     def find_by_reference_ids(reference_ids, _connection=None, page_size=100,
-        page_number=0, sort_by=enums.DEFAULT_SORT_BY,
-        sort_order=enums.DEFAULT_SORT_ORDER, unfiltered=False):
+                              page_number=0, sort_by=enums.DEFAULT_SORT_BY,
+                              sort_order=enums.DEFAULT_SORT_ORDER,
+                              unfiltered=False, **kwargs):
         """
         List all videos identified by a list of reference ids
         """
@@ -757,7 +758,7 @@ class Video(object):
             apicall = 'find_videos_by_reference_ids_unfiltered'
         return connection.ItemResultSet(
             apicall, Video, _connection, page_size,
-            page_number, sort_by, sort_order, reference_ids=ids)
+            page_number, sort_by, sort_order, reference_ids=ids, **kwargs)
 
     @staticmethod
     def find_by_ids(ids, _connection=None, page_size=100, page_number=0,
