@@ -745,7 +745,7 @@ class Video(object):
     def find_by_reference_ids(reference_ids, _connection=None, page_size=100,
                               page_number=0, sort_by=enums.DEFAULT_SORT_BY,
                               sort_order=enums.DEFAULT_SORT_ORDER,
-                              unfiltered=False, **kwargs):
+                              **kwargs):
         """
         List all videos identified by a list of reference ids
         """
@@ -754,7 +754,7 @@ class Video(object):
             raise exceptions.PyBrightcoveError(err)
         ids = ','.join(reference_ids)
         apicall = 'find_videos_by_reference_ids'
-        if unfiltered:
+        if kwargs.get('unfiltered'):
             apicall = 'find_videos_by_reference_ids_unfiltered'
         return connection.ItemResultSet(
             apicall, Video, _connection, page_size,
@@ -763,7 +763,7 @@ class Video(object):
     @staticmethod
     def find_by_ids(ids, _connection=None, page_size=100, page_number=0,
         sort_by=enums.DEFAULT_SORT_BY, sort_order=enums.DEFAULT_SORT_ORDER,
-        unfiltered=False, **kwargs):
+        **kwargs):
         """
         List all videos identified by a list of Brightcove video ids
         """
@@ -772,7 +772,7 @@ class Video(object):
             raise exceptions.PyBrightcoveError(err)
         ids = ','.join([str(i) for i in ids])
         apicall = 'find_videos_by_ids'
-        if unfiltered:
+        if kwargs.get('unfiltered'):
             apicall = 'find_videos_by_ids_unfiltered'
         return connection.ItemResultSet(apicall,
             Video, _connection, page_size, page_number, sort_by, sort_order,
