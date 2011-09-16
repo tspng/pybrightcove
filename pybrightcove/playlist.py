@@ -168,41 +168,48 @@ class Playlist(object):
 
     @staticmethod
     def find_all(_connection=None, page_size=100, page_number=0,
-        sort_by=DEFAULT_SORT_BY, sort_order=DEFAULT_SORT_ORDER):
+                 sort_by=DEFAULT_SORT_BY, sort_order=DEFAULT_SORT_ORDER,
+                 **kwargs):
         """
         List all playlists.
         """
-        return pybrightcove.connection.ItemResultSet("find_all_playlists",
-            Playlist, _connection, page_size, page_number, sort_by, sort_order)
+        return pybrightcove.connection.ItemResultSet(
+            "find_all_playlists",
+            Playlist, _connection, page_size, page_number, sort_by, sort_order,
+            **kwargs)
 
     @staticmethod
     def find_by_ids(ids, _connection=None, page_size=100, page_number=0,
-        sort_by=DEFAULT_SORT_BY, sort_order=DEFAULT_SORT_ORDER):
+                    sort_by=DEFAULT_SORT_BY, sort_order=DEFAULT_SORT_ORDER,
+                    **kwargs):
         """
         List playlists by specific IDs.
         """
         ids = ','.join([str(i) for i in ids])
         return pybrightcove.connection.ItemResultSet('find_playlists_by_ids',
             Playlist, _connection, page_size, page_number, sort_by, sort_order,
-            playlist_ids=ids)
+            playlist_ids=ids, **kwargs)
 
     @staticmethod
     def find_by_reference_ids(reference_ids, _connection=None, page_size=100,
-        page_number=0, sort_by=DEFAULT_SORT_BY, sort_order=DEFAULT_SORT_ORDER):
+                              page_number=0, sort_by=DEFAULT_SORT_BY,
+                              sort_order=DEFAULT_SORT_ORDER, **kwargs):
         """
         List playlists by specific reference_ids.
         """
         reference_ids = ','.join([str(i) for i in reference_ids])
         return pybrightcove.connection.ItemResultSet(
             "find_playlists_by_reference_ids", Playlist, _connection, page_size,
-            page_number, sort_by, sort_order, reference_ids=reference_ids)
+            page_number, sort_by, sort_order, reference_ids=reference_ids,
+            **kwargs)
 
     @staticmethod
     def find_for_player_id(player_id, _connection=None, page_size=100,
-        page_number=0, sort_by=DEFAULT_SORT_BY, sort_order=DEFAULT_SORT_ORDER):
+                           page_number=0, sort_by=DEFAULT_SORT_BY,
+                           sort_order=DEFAULT_SORT_ORDER, **kwargs):
         """
         List playlists for a for given player id.
         """
         return pybrightcove.connection.ItemResultSet(
             "find_playlists_for_player_id", Playlist, _connection, page_size,
-            page_number, sort_by, sort_order, player_id=player_id)
+            page_number, sort_by, sort_order, player_id=player_id, **kwargs)

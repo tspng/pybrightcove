@@ -127,7 +127,7 @@ class VideoTest(unittest.TestCase):
         c.page_size = 0
         m.get_list.return_value = c
         return m
-    
+
     def _get_item_mock(self, ConnectionMock):
         m = ConnectionMock()
         m.get_item.return_value = {}
@@ -208,7 +208,7 @@ class VideoTest(unittest.TestCase):
         r.video_duration = 60000
         r.video_codec = pybrightcove.enums.VideoCodecEnum.H264
         renditions.append(r)
-        
+
         r = pybrightcove.video.Rendition()
         r.remote_url = 'http://my.server.com/480_h264.flv'
         r.size = 2325225
@@ -219,7 +219,7 @@ class VideoTest(unittest.TestCase):
         video = pybrightcove.video.Video(name='The Bears', renditions=renditions,
             short_description='Opening roll for an exciting soccer match.')
         video.tags.append('unittest')
-        
+
         self.assertEquals(video.id, None)
         video.save()
         m.post.return_value = {'id': 123456, 'referenceId': 777777, 'type': 'VIDEO_STILL', 'remoteUrl': 'http://my.sample.com/image-2', 'displayName': None}
@@ -231,7 +231,7 @@ class VideoTest(unittest.TestCase):
         i.type = pybrightcove.enums.ImageTypeEnum.VIDEO_STILL
         i.remote_url = 'http://my.sample.com/image-2.jpg'
         video.set_image(i)
-        
+
         self.assertEquals(video.id, 10)
         self.assertEquals(m.method_calls[0][0], 'post')
         self.assertEquals(m.method_calls[0][1][0], 'create_video')
@@ -323,7 +323,7 @@ class VideoTest(unittest.TestCase):
         self.assertEquals(m.method_calls[1][0], 'post')
         self.assertEquals(m.method_calls[1][1][0], 'get_upload_status')
         self.assertEquals(m.method_calls[1][2]['video_id'], TEST_VIDEO_ID)
-        
+
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_delete(self, ConnectionMock):
         m = ConnectionMock()
@@ -406,6 +406,15 @@ class VideoTest(unittest.TestCase):
         self.assertEquals(m.method_calls[0][1][0], 'find_videos_by_reference_ids')
         self.assertEquals(m.method_calls[0][2]['reference_ids'], ','.join([str(x) for x in TEST_VIDEO_REF_IDS]))
 
+        m = self._get_list_mock(ConnectionMock)
+        videos = pybrightcove.video.Video.find_by_reference_ids(TEST_VIDEO_REF_IDS, unfiltered=True)
+        for video in videos:
+            print video #self.assertEquals(type(video), Video)
+        print m.method_calls
+        self.assertEquals(m.method_calls[1][0], 'get_list')
+        self.assertEquals(m.method_calls[1][1][0], 'find_videos_by_reference_ids_unfiltered')
+        self.assertEquals(m.method_calls[1][2]['reference_ids'], ','.join([str(x) for x in TEST_VIDEO_REF_IDS]))
+
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_find_by_ids(self, ConnectionMock):
         m = self._get_list_mock(ConnectionMock)
@@ -416,7 +425,16 @@ class VideoTest(unittest.TestCase):
         self.assertEquals(m.method_calls[0][0], 'get_list')
         self.assertEquals(m.method_calls[0][1][0], 'find_videos_by_ids')
         self.assertEquals(m.method_calls[0][2]['video_ids'], ','.join([str(x) for x in TEST_VIDEO_IDS]))
-    
+
+        m = self._get_list_mock(ConnectionMock)
+        videos = pybrightcove.video.Video.find_by_ids(TEST_VIDEO_IDS, unfiltered=True)
+        for video in videos:
+            print video #self.assertEquals(type(video), Video)
+        print m.method_calls
+        self.assertEquals(m.method_calls[1][0], 'get_list')
+        self.assertEquals(m.method_calls[1][1][0], 'find_videos_by_ids_unfiltered')
+        self.assertEquals(m.method_calls[1][2]['video_ids'], ','.join([str(x) for x in TEST_VIDEO_IDS]))
+
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_find_by_id(self, ConnectionMock):
         m = self._get_item_mock(ConnectionMock)
@@ -425,7 +443,7 @@ class VideoTest(unittest.TestCase):
         print m.method_calls
         self.assertEquals(m.method_calls[0][0], 'get_item')
         self.assertEquals(m.method_calls[0][1][0], 'find_video_by_id')
-    
+
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_get_metadata(self, ConnectionMock):
         m = self._get_item_mock(ConnectionMock)

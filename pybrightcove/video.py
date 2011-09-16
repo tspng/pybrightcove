@@ -596,14 +596,15 @@ class Video(object):
             if data:
                 self.image = Image(data=data)
 
-    def find_related(self, _connection=None, page_size=100, page_number=0):
+    def find_related(self, _connection=None, page_size=100, page_number=0,
+                     **kwargs):
         """
         List all videos that are related to this one.
         """
         if self.id:
             return connection.ItemResultSet('find_related_videos',
                 Video, _connection, page_size, page_number, None, None,
-                video_id=self.id)
+                video_id=self.id, **kwargs)
 
     def deactivate(self):
         """
@@ -649,8 +650,9 @@ class Video(object):
 
     @staticmethod
     def find_modified(since, filter_list=None, _connection=None, page_size=25,
-        page_number=0, sort_by=enums.DEFAULT_SORT_BY,
-        sort_order=enums.DEFAULT_SORT_ORDER):
+                      page_number=0, sort_by=enums.DEFAULT_SORT_BY,
+                      sort_order=enums.DEFAULT_SORT_ORDER,
+                      **kwargs):
         """
         List all videos modified since a certain date.
         """
@@ -668,7 +670,7 @@ class Video(object):
 
         return connection.ItemResultSet('find_modified_videos',
             Video, _connection, page_size, page_number, sort_by, sort_order,
-            from_date=fdate, filter=filters)
+            from_date=fdate, filter=filters, **kwargs)
 
     @staticmethod
     def find_all(_connection=None, page_size=100, page_number=0,
@@ -684,8 +686,10 @@ class Video(object):
 
     @staticmethod
     def find_by_tags(and_tags=None, or_tags=None, _connection=None,
-        page_size=100, page_number=0, sort_by=enums.DEFAULT_SORT_BY,
-        sort_order=enums.DEFAULT_SORT_ORDER):
+                     page_size=100, page_number=0,
+                     sort_by=enums.DEFAULT_SORT_BY,
+                     sort_order=enums.DEFAULT_SORT_ORDER,
+                     **kwargs):
         """
         List videos given a certain set of tags.
         """
@@ -708,38 +712,44 @@ class Video(object):
             otags = ','.join([str(t) for t in or_tags])
         return connection.ItemResultSet('find_videos_by_tags',
             Video, _connection, page_size, page_number, sort_by, sort_order,
-            and_tags=atags, or_tags=otags)
+            and_tags=atags, or_tags=otags, **kwargs)
 
     @staticmethod
     def find_by_text(text, _connection=None, page_size=100, page_number=0,
-        sort_by=enums.DEFAULT_SORT_BY, sort_order=enums.DEFAULT_SORT_ORDER):
+                     sort_by=enums.DEFAULT_SORT_BY,
+                     sort_order=enums.DEFAULT_SORT_ORDER,
+                     **kwargs):
         """
         List videos that match the ``text`` in title or description.
         """
         return connection.ItemResultSet('find_videos_by_text',
             Video, _connection, page_size, page_number, sort_by, sort_order,
-            text=text)
+            text=text, **kwargs)
 
     @staticmethod
     def find_by_campaign(campaign_id, _connection=None, page_size=100,
-        page_number=0, sort_by=enums.DEFAULT_SORT_BY,
-        sort_order=enums.DEFAULT_SORT_ORDER):
+                         page_number=0, sort_by=enums.DEFAULT_SORT_BY,
+                         sort_order=enums.DEFAULT_SORT_ORDER,
+                         **kwargs):
         """
         List all videos for a given campaign.
         """
         return connection.ItemResultSet(
             'find_videos_by_campaign_id', Video, _connection, page_size,
-            page_number, sort_by, sort_order, campaign_id=campaign_id)
+            page_number, sort_by, sort_order, campaign_id=campaign_id,
+            **kwargs)
 
     @staticmethod
     def find_by_user(user_id, _connection=None, page_size=100, page_number=0,
-        sort_by=enums.DEFAULT_SORT_BY, sort_order=enums.DEFAULT_SORT_ORDER):
+                     sort_by=enums.DEFAULT_SORT_BY,
+                     sort_order=enums.DEFAULT_SORT_ORDER,
+                     **kwargs):
         """
         List all videos uploaded by a certain user.
         """
         return connection.ItemResultSet('find_videos_by_user_id',
             Video, _connection, page_size, page_number, sort_by, sort_order,
-            user_id=user_id)
+            user_id=user_id, **kwargs)
 
     @staticmethod
     def find_by_reference_ids(reference_ids, _connection=None, page_size=100,
