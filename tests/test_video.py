@@ -406,7 +406,6 @@ class VideoTest(unittest.TestCase):
         self.assertEquals(m.method_calls[0][1][0], 'find_videos_by_reference_ids')
         self.assertEquals(m.method_calls[0][2]['reference_ids'], ','.join([str(x) for x in TEST_VIDEO_REF_IDS]))
 
-        m = self._get_list_mock(ConnectionMock)
         videos = pybrightcove.video.Video.find_by_reference_ids(TEST_VIDEO_REF_IDS, unfiltered=True)
         for video in videos:
             print video #self.assertEquals(type(video), Video)
@@ -426,7 +425,6 @@ class VideoTest(unittest.TestCase):
         self.assertEquals(m.method_calls[0][1][0], 'find_videos_by_ids')
         self.assertEquals(m.method_calls[0][2]['video_ids'], ','.join([str(x) for x in TEST_VIDEO_IDS]))
 
-        m = self._get_list_mock(ConnectionMock)
         videos = pybrightcove.video.Video.find_by_ids(TEST_VIDEO_IDS, unfiltered=True)
         for video in videos:
             print video #self.assertEquals(type(video), Video)
