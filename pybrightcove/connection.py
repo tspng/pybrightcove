@@ -265,7 +265,6 @@ class APIConnection(Connection):
                                   page_number=page_number,
                                   sort_by=sort_by,
                                   sort_order=sort_order,
-                                  video_fields=None,
                                   get_item_count="true",
                                   **kwargs)
         return ItemCollection(data=data,
