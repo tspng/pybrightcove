@@ -169,7 +169,7 @@ class APIConnection(Connection):
     """
 
     def __init__(self, read_token=None, write_token=None, read_url=None,
-        write_url=None, video_fields=None):
+        write_url=None):
         super(APIConnection, self).__init__(read_token=read_token,
             write_token=write_token, read_url=read_url, write_url=write_url)
         if not hasattr(self, "read_token"):
@@ -177,7 +177,6 @@ class APIConnection(Connection):
                 "Must specify at least a read_token.")
         self._api_url = None
         self._api_raw_data = None
-        self._video_fields = video_fields
 
     def _post(self, data, file_to_upload=None):
         """
@@ -266,7 +265,6 @@ class APIConnection(Connection):
                                   page_number=page_number,
                                   sort_by=sort_by,
                                   sort_order=sort_order,
-                                  video_fields=self._video_fields,
                                   get_item_count="true",
                                   **kwargs)
         return ItemCollection(data=data,
