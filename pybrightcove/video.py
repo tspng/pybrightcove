@@ -429,6 +429,7 @@ class Video(object):
         self.published_date = _convert_tstamp(data['publishedDate'])
         self.start_date = _convert_tstamp(data.get('startDate', None))
         self.end_date = _convert_tstamp(data.get('endDate', None))
+        self.item_state = data.get('itemState', None)
         self.reference_id = data['referenceId']
         self.short_description = data['shortDescription']
         self.tags = []
@@ -468,7 +469,7 @@ class Video(object):
             if msg:
                 raise exceptions.PyBrightcoveError(msg)
         return super(Video, self).__setattr__(name, value)
-    
+
     def get_custom_metadata(self):
         """
         Fetches custom metadta for an already exisiting Video.
