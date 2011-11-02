@@ -438,38 +438,6 @@ class Video(object):
         self.thumbnail_url = data['thumbnailURL']
         self.video_still_url = data['videoStillURL']
 
-    def __setattr__(self, name, value):
-        msg = None
-        if value:
-            if name == 'name' and len(value) > 255:
-                msg = "Video.name must be 255 characters or less."
-            if name == 'reference_id' and len(value) > 150:
-                # val = value[:150]
-                msg = "Video.reference_id must be 150 characters or less."
-            if name == 'long_description' and len(value) > 5000:
-                # val = value[:5000]
-                msg = "Video.long_description must be 5000 characters or less."
-            if name == 'short_description' and len(value) > 250:
-                # val = value[:250]
-                msg = "Video.short_description must be 250 characters or less."
-            if name == 'item_state' and value not in (
-                    enums.ItemStateEnum.ACTIVE,
-                    enums.ItemStateEnum.INACTIVE):
-                msg = "Video.item_state must be either ItemStateEnum.ACTIVE or"
-                msg += " ItemStateEnum.INACTIVE"
-            if name == 'video_full_length' and \
-                    not isinstance(value, Rendition):
-                msg = "Video.video_full_length must be of type Rendition"
-            if name == 'economics' and value not in \
-                    (enums.EconomicsEnum.FREE,
-                     enums.EconomicsEnum.AD_SUPPORTED):
-                msg = "Video.economics must be either EconomicsEnum.FREE or "
-                msg += "EconomicsEnum.AD_SUPPORTED"
-
-            if msg:
-                raise exceptions.PyBrightcoveError(msg)
-        return super(Video, self).__setattr__(name, value)
-
     def get_custom_metadata(self):
         """
         Fetches custom metadta for an already exisiting Video.
