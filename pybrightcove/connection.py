@@ -134,7 +134,8 @@ class FTPConnection(Connection):
         xml = kwargs.get("xml")
         assets = kwargs.get("assets")
         if xml is None or assets is None:
-            raise Exception("Invalid keyword arguments!")
+            msg ="Invalid keyword arguments, needed xml or assets but got: %s" % repr(kwargs) 
+            raise Exception(msg)
 
         ## Build manifest
         manifest = self.get_manifest(xml)
