@@ -553,7 +553,7 @@ class Video(object):
                 return self.connection.post('share_video', video_id=self.id,
                     auto_accept=True, sharee_account_ids=accounts)
             else:
-                raise VideoStatusNotComplete
+                raise exceptions.VideoStatusNotComplete
 
     def set_image(self, image, filename=None, resize=False):
         """
