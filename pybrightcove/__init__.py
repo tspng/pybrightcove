@@ -22,7 +22,7 @@
 pybrightcove is a simple wrapper around the Brightcove Media API
 """
 
-VERSION = (1, 3, 7, "cmg", 6)  # following PEP 386
+VERSION = (1, 3, 7, "cmg", 7)  # following PEP 386
 DEV_N = 1
 
 

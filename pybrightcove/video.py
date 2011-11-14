@@ -41,6 +41,7 @@ def is_ftp_connection(con):
     """
     return isinstance(con, connection.FTPConnection)
 
+
 def _convert_tstamp(val):
     """
     Safe convert string timestamp into a ``datetime`` object.  Returns None if
@@ -468,7 +469,7 @@ class Video(object):
         """
         m = hashlib.md5()
         fp = file(filename, 'rb')
-        bits = fp.read(262144)  ## 256KB
+        bits = fp.read(262144)  # 256KB
         while bits:
             m.update(bits)
             bits = fp.read(262144)
@@ -532,7 +533,29 @@ class Video(object):
         if self.id:
             self.connection.post('delete_video', video_id=self.id,
                 cascade=cascade, delete_shares=delete_shares)
-            self.id = None ## Prevent more activity on this video id
+            self.id = None  # Prevent more activity on this video id
+
+    @staticmethod
+    def ensure_essential_fields(**kwargs):
+        """
+        Ensures API calls have the appropriate fields for Video
+        creation, because the BC API fails to provide essentials on a
+        custom call.
+        """
+
+        # see Video._load for all key fields
+        essentials = ["creationDate", "economics", "id",
+                      "lastModifiedDate", "length", "linkText",
+                      "linkURL", "longDescription", "name",
+                      "playsTotal", "playsTrailingWeek",
+                      "publishedDate", "referenceId",
+                      "shortDescription"]
+
+        if kwargs.get('video_fields'):
+            kwargs['video_fields'].extend(essentials)
+            kwargs['video_fields'] = list(set(kwargs['video_fields']))
+
+        return kwargs
 
     def get_upload_status(self):
         """
@@ -571,6 +594,7 @@ class Video(object):
         List all videos that are related to this one.
         """
         if self.id:
+            kwargs = Video.ensure_essential_fields(**kwargs)
             return connection.ItemResultSet('find_related_videos',
                 Video, _connection, page_size, page_number, None, None,
                 video_id=self.id, **kwargs)
@@ -629,7 +653,7 @@ class Video(object):
         if filter_list is not None:
             filters = filter_list
         if isinstance(since, datetime):
-            fdate = int(since.strftime("%s")) / 60  ## Minutes since UNIX time
+            fdate = int(since.strftime("%s")) / 60  # Minutes since UNIX time
         elif since == 0:
             fdate = '0'  # This should be a string, otherwise kwargs
                          # thinks it's not existent
@@ -637,6 +661,7 @@ class Video(object):
             msg = 'The parameter "since" must be a datetime object.'
             raise exceptions.PyBrightcoveError(msg)
 
+        kwargs = Video.ensure_essential_fields(**kwargs)
         return connection.ItemResultSet('find_modified_videos',
             Video, _connection, page_size, page_number, sort_by, sort_order,
             from_date=fdate, filter=filters, **kwargs)
@@ -650,6 +675,8 @@ class Video(object):
         """
         List all videos.
         """
+
+        kwargs = Video.ensure_essential_fields(**kwargs)
         return connection.ItemResultSet('find_all_videos', Video,
             _connection, page_size, page_number, sort_by, sort_order, **kwargs)
 
@@ -679,6 +706,8 @@ class Video(object):
             atags = ','.join([str(t) for t in and_tags])
         if or_tags:
             otags = ','.join([str(t) for t in or_tags])
+
+        kwargs = Video.ensure_essential_fields(**kwargs)
         return connection.ItemResultSet('find_videos_by_tags',
             Video, _connection, page_size, page_number, sort_by, sort_order,
             and_tags=atags, or_tags=otags, **kwargs)
@@ -691,6 +720,7 @@ class Video(object):
         """
         List videos that match the ``text`` in title or description.
         """
+        kwargs = Video.ensure_essential_fields(**kwargs)
         return connection.ItemResultSet('find_videos_by_text',
             Video, _connection, page_size, page_number, sort_by, sort_order,
             text=text, **kwargs)
@@ -703,6 +733,7 @@ class Video(object):
         """
         List all videos for a given campaign.
         """
+        kwargs = Video.ensure_essential_fields(**kwargs)
         return connection.ItemResultSet(
             'find_videos_by_campaign_id', Video, _connection, page_size,
             page_number, sort_by, sort_order, campaign_id=campaign_id,
@@ -716,6 +747,7 @@ class Video(object):
         """
         List all videos uploaded by a certain user.
         """
+        kwargs = Video.ensure_essential_fields(**kwargs)
         return connection.ItemResultSet('find_videos_by_user_id',
             Video, _connection, page_size, page_number, sort_by, sort_order,
             user_id=user_id, **kwargs)
@@ -735,6 +767,7 @@ class Video(object):
         apicall = 'find_videos_by_reference_ids'
         if kwargs.get('unfiltered'):
             apicall = 'find_videos_by_reference_ids_unfiltered'
+        kwargs = Video.ensure_essential_fields(**kwargs)
         return connection.ItemResultSet(
             apicall, Video, _connection, page_size,
             page_number, sort_by, sort_order, reference_ids=ids, **kwargs)
@@ -753,7 +786,7 @@ class Video(object):
         apicall = 'find_videos_by_ids'
         if kwargs.get('unfiltered'):
             apicall = 'find_videos_by_ids_unfiltered'
+        kwargs = Video.ensure_essential_fields(**kwargs)
         return connection.ItemResultSet(apicall,
             Video, _connection, page_size, page_number, sort_by, sort_order,
             video_ids=ids, **kwargs)
-

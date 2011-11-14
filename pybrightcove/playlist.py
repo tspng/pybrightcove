@@ -33,6 +33,7 @@ VALID_PLAYLIST_TYPES = (pybrightcove.enums.PlaylistTypeEnum.EXPLICIT,
                         pybrightcove.enums.PlaylistTypeEnum.PLAYS_TOTAL,
                         pybrightcove.enums.PlaylistTypeEnum.PLAYS_TRAILING_WEEK)
 
+
 class Playlist(object):
     """
     The Playlist object is a collection of Videos.
@@ -167,12 +168,29 @@ class Playlist(object):
             self.id = None
 
     @staticmethod
+    def ensure_essential_fields(**kwargs):
+        """
+        Ensures API calls have the appropriate fields for Playlist
+        creation, because the BC API fails to provide essentials on a
+        custom call.
+        """
+        # see Playlist._load for field details
+        essentials = ['id', 'referenceId', 'name', 'shortDescription',
+                      'thumbnailURL', 'videoIds', 'playlistType']
+
+        if kwargs.get('playlist_fields'):
+            kwargs['playlist_fields'].extend(essentials)
+            kwargs['playlist_fields'] = list(set(kwargs['playlist_fields']))
+        return kwargs
+
+    @staticmethod
     def find_all(_connection=None, page_size=100, page_number=0,
                  sort_by=DEFAULT_SORT_BY, sort_order=DEFAULT_SORT_ORDER,
                  **kwargs):
         """
         List all playlists.
         """
+        kwargs = Playlist.ensure_essential_fields(**kwargs)
         return pybrightcove.connection.ItemResultSet(
             "find_all_playlists",
             Playlist, _connection, page_size, page_number, sort_by, sort_order,
@@ -186,6 +204,7 @@ class Playlist(object):
         List playlists by specific IDs.
         """
         ids = ','.join([str(i) for i in ids])
+        kwargs = Playlist.ensure_essential_fields(**kwargs)
         return pybrightcove.connection.ItemResultSet('find_playlists_by_ids',
             Playlist, _connection, page_size, page_number, sort_by, sort_order,
             playlist_ids=ids, **kwargs)
@@ -198,6 +217,7 @@ class Playlist(object):
         List playlists by specific reference_ids.
         """
         reference_ids = ','.join([str(i) for i in reference_ids])
+        kwargs = Playlist.ensure_essential_fields(**kwargs)
         return pybrightcove.connection.ItemResultSet(
             "find_playlists_by_reference_ids", Playlist, _connection, page_size,
             page_number, sort_by, sort_order, reference_ids=reference_ids,
@@ -210,6 +230,7 @@ class Playlist(object):
         """
         List playlists for a for given player id.
         """
+        kwargs = Playlist.ensure_essential_fields(**kwargs)
         return pybrightcove.connection.ItemResultSet(
             "find_playlists_for_player_id", Playlist, _connection, page_size,
             page_number, sort_by, sort_order, player_id=player_id, **kwargs)
