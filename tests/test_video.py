@@ -61,6 +61,7 @@ IMAGE_DATA = {
     'remoteUrl': 'image url'
 }
 
+
 class RenditionTest(unittest.TestCase):
 
     def test_invalid_size_type(self):
@@ -135,7 +136,6 @@ class VideoTest(unittest.TestCase):
 
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_instantiate_new(self, ConnectionMock):
-        m = ConnectionMock()
         video = pybrightcove.video.Video(filename='/mnt/local/movie.mov', name='My Movie',
             short_description='This is my movie.')
         self.assertEquals(video.id, None)
@@ -167,9 +167,9 @@ class VideoTest(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_instantiate_with_invalid_parameters(self, ConnectionMock):
         try:
-            video = pybrightcove.video.Video(name='This is wrong.')
+            pybrightcove.video.Video(name='This is wrong.')
             self.fail('Should not have worked, but rather raised an error.')
-            video = pybrightcove.video.Video()
+            pybrightcove.video.Video()
             self.fail('Should not have worked, but rather raised an error.')
         except pybrightcove.exceptions.PyBrightcoveError, e:
             self.assertEquals(str(e), 'Invalid parameters for Video.')
@@ -273,7 +273,6 @@ class VideoTest(unittest.TestCase):
         video = pybrightcove.video.Video(id=TEST_VIDEO_ID)
         video.tags.append('tag-%s' % self.test_uuid)
         video.tags.append('unittest')
-        lmd = video.last_modified_date
         self.assertEquals(video.id, TEST_VIDEO_ID)
         video.save()
         self.assertEquals(video.id, TEST_VIDEO_ID)
@@ -294,7 +293,6 @@ class VideoTest(unittest.TestCase):
         video.tags.append('unittest')
         video.add_custom_metadata('genre', 'Sci-Fi', 'string')
         video.add_custom_metadata('rating', 'PG-13', 'string')
-        lmd = video.last_modified_date
         self.assertEquals(video.id, TEST_VIDEO_ID)
         video.save()
         self.assertEquals(video.id, TEST_VIDEO_ID)
@@ -309,7 +307,6 @@ class VideoTest(unittest.TestCase):
         self.assertTrue('rating' in m.method_calls[1][2]['video']['customFields'])
         self.assertEquals(m.method_calls[1][2]['video']['customFields']['genre'], 'Sci-Fi')
         self.assertEquals(m.method_calls[1][2]['video']['customFields']['rating'], 'PG-13')
-
 
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_get_upload_status(self, ConnectionMock):
@@ -356,7 +353,7 @@ class VideoTest(unittest.TestCase):
         m = self._get_list_mock(ConnectionMock)
         videos = pybrightcove.video.Video.find_by_tags(and_tags=['unittest', 'two'])
         for video in videos:
-            print video #self.assertEquals(type(video), Video)
+            print video  # self.assertEquals(type(video), Video)
         print m.method_calls
         self.assertEquals(m.method_calls[0][0], 'get_list')
         self.assertEquals(m.method_calls[0][1][0], 'find_videos_by_tags')
@@ -367,7 +364,7 @@ class VideoTest(unittest.TestCase):
         m = self._get_list_mock(ConnectionMock)
         videos = pybrightcove.video.Video.find_by_text('bear')
         for video in videos:
-            print video #self.assertEquals(type(video), Video)
+            print video  # self.assertEquals(type(video), Video)
         print m.method_calls
         self.assertEquals(m.method_calls[0][0], 'get_list')
         self.assertEquals(m.method_calls[0][1][0], 'find_videos_by_text')
@@ -378,7 +375,7 @@ class VideoTest(unittest.TestCase):
         m = self._get_list_mock(ConnectionMock)
         videos = pybrightcove.video.Video.find_by_campaign(988756758)
         for video in videos:
-            print video #self.assertEquals(type(video), Video)
+            print video  # self.assertEquals(type(video), Video)
         print m.method_calls
         self.assertEquals(m.method_calls[0][0], 'get_list')
         self.assertEquals(m.method_calls[0][1][0], 'find_videos_by_campaign_id')
@@ -389,7 +386,7 @@ class VideoTest(unittest.TestCase):
         m = self._get_list_mock(ConnectionMock)
         videos = pybrightcove.video.Video.find_by_user(12312431)
         for video in videos:
-            print video #self.assertEquals(type(video), Video)
+            print video  # self.assertEquals(type(video), Video)
         print m.method_calls
         self.assertEquals(m.method_calls[0][0], 'get_list')
         self.assertEquals(m.method_calls[0][1][0], 'find_videos_by_user_id')
@@ -400,7 +397,7 @@ class VideoTest(unittest.TestCase):
         m = self._get_list_mock(ConnectionMock)
         videos = pybrightcove.video.Video.find_by_reference_ids(TEST_VIDEO_REF_IDS)
         for video in videos:
-            print video #self.assertEquals(type(video), Video)
+            print video  # self.assertEquals(type(video), Video)
         print m.method_calls
         self.assertEquals(m.method_calls[0][0], 'get_list')
         self.assertEquals(m.method_calls[0][1][0], 'find_videos_by_reference_ids')
@@ -408,7 +405,7 @@ class VideoTest(unittest.TestCase):
 
         videos = pybrightcove.video.Video.find_by_reference_ids(TEST_VIDEO_REF_IDS, unfiltered=True)
         for video in videos:
-            print video #self.assertEquals(type(video), Video)
+            print video  # self.assertEquals(type(video), Video)
         print m.method_calls
         self.assertEquals(m.method_calls[1][0], 'get_list')
         self.assertEquals(m.method_calls[1][1][0], 'find_videos_by_reference_ids_unfiltered')
@@ -419,7 +416,7 @@ class VideoTest(unittest.TestCase):
         m = self._get_list_mock(ConnectionMock)
         videos = pybrightcove.video.Video.find_by_ids(TEST_VIDEO_IDS)
         for video in videos:
-            print video #self.assertEquals(type(video), Video)
+            print video  # self.assertEquals(type(video), Video)
         print m.method_calls
         self.assertEquals(m.method_calls[0][0], 'get_list')
         self.assertEquals(m.method_calls[0][1][0], 'find_videos_by_ids')
@@ -427,7 +424,7 @@ class VideoTest(unittest.TestCase):
 
         videos = pybrightcove.video.Video.find_by_ids(TEST_VIDEO_IDS, unfiltered=True)
         for video in videos:
-            print video #self.assertEquals(type(video), Video)
+            print video  # self.assertEquals(type(video), Video)
         print m.method_calls
         self.assertEquals(m.method_calls[1][0], 'get_list')
         self.assertEquals(m.method_calls[1][1][0], 'find_videos_by_ids_unfiltered')
@@ -437,7 +434,7 @@ class VideoTest(unittest.TestCase):
     def test_find_by_id(self, ConnectionMock):
         m = self._get_item_mock(ConnectionMock)
         video = pybrightcove.video.Video(id=TEST_VIDEO_IDS[0])
-        print video #self.assertEquals(type(video), Video)
+        print video  # self.assertEquals(type(video), Video)
         print m.method_calls
         self.assertEquals(m.method_calls[0][0], 'get_item')
         self.assertEquals(m.method_calls[0][1][0], 'find_video_by_id')
@@ -448,7 +445,7 @@ class VideoTest(unittest.TestCase):
         video = pybrightcove.video.Video(id=TEST_VIDEO_IDS[0])
         m.get_item.return_value = {"customFields": {"sample": "title"}}
         video.get_custom_metadata()
-        print video #self.assertEquals(type(video), Video)
+        print video  # self.assertEquals(type(video), Video)
         print m.method_calls
         print video.metadata
         self.assertEquals(m.method_calls[0][0], 'get_item')
@@ -463,7 +460,7 @@ class VideoTest(unittest.TestCase):
         m = self._get_list_mock(ConnectionMock)
         videos = pybrightcove.video.Video.find_all()
         for video in videos:
-            print video #self.assertEquals(type(video), Video)
+            print video  # self.assertEquals(type(video), Video)
         print m.method_calls
         self.assertEquals(m.method_calls[0][0], 'get_list')
         self.assertEquals(m.method_calls[0][1][0], 'find_all_videos')
@@ -474,7 +471,7 @@ class VideoTest(unittest.TestCase):
         m.get_item.return_value = VIDEO_DATA
         video = pybrightcove.video.Video(id=TEST_VIDEO_ID)
         for related_video in video.find_related():
-            print related_video #self.assertEquals(type(related_video), Video)
+            print related_video  # self.assertEquals(type(related_video), Video)
         print m.method_calls
         self.assertEquals(m.method_calls[1][0], 'get_list')
         self.assertEquals(m.method_calls[1][1][0], 'find_related_videos')
@@ -486,7 +483,7 @@ class VideoTest(unittest.TestCase):
         yesterday = datetime.now() - timedelta(days=1)
         videos = pybrightcove.video.Video.find_modified(since=yesterday)
         for video in videos:
-            print video #self.assertEquals(type(video), Video)
+            print video  # self.assertEquals(type(video), Video)
         print m.method_calls
         self.assertEquals(m.method_calls[0][0], 'get_list')
         self.assertEquals(m.method_calls[0][1][0], 'find_modified_videos')
@@ -500,7 +497,7 @@ class VideoTest(unittest.TestCase):
             pybrightcove.enums.FilterChoicesEnum.DELETED]
         videos = pybrightcove.video.Video.find_modified(since=yesterday, filter_list=filters)
         for video in videos:
-            print video #self.assertEquals(type(video), Video)
+            print video  # self.assertEquals(type(video), Video)
         self.assertEquals(m.method_calls[0][0], 'get_list')
         self.assertEquals(m.method_calls[0][1][0], 'find_modified_videos')
         self.assertEquals(m.method_calls[0][2]['from_date'] > 0, True)
@@ -509,7 +506,7 @@ class VideoTest(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_invalid_name(self, ConnectionMock):
         try:
-            video = pybrightcove.video.Video(name="Name is too long"*20,
+            pybrightcove.video.Video(name="Name is too long" * 20,
                           short_description="ok desc",
                           filename="somefile.mov")
         except pybrightcove.exceptions.PyBrightcoveError, e:
@@ -521,8 +518,8 @@ class VideoTest(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_invalid_short_description(self, ConnectionMock):
         try:
-            video = pybrightcove.video.Video(name="Name is too long",
-                          short_description="ok desc"*100,
+            pybrightcove.video.Video(name="Name is too long",
+                          short_description="ok desc" * 100,
                           filename="somefile.mov")
         except pybrightcove.exceptions.PyBrightcoveError, e:
             self.assertEqual(str(e),
@@ -536,7 +533,7 @@ class VideoTest(unittest.TestCase):
             video = pybrightcove.video.Video(name="Name is too long",
                           short_description="ok desc",
                           filename="somefile.mov")
-            video.long_description = "Very long"*5000
+            video.long_description = "Very long" * 5000
         except pybrightcove.exceptions.PyBrightcoveError, e:
             self.assertEqual(str(e),
                 "Video.long_description must be 5000 characters or less.")
@@ -549,7 +546,7 @@ class VideoTest(unittest.TestCase):
             video = pybrightcove.video.Video(name="Name is too long",
                           short_description="ok desc",
                           filename="somefile.mov")
-            video.reference_id = "long ref id"*100
+            video.reference_id = "long ref id" * 100
         except pybrightcove.exceptions.PyBrightcoveError, e:
             self.assertEqual(str(e),
                 "Video.reference_id must be 150 characters or less.")
@@ -579,7 +576,7 @@ class VideoTest(unittest.TestCase):
             video.item_state = "Invalid"
         except pybrightcove.exceptions.PyBrightcoveError, e:
             err = "Video.item_state must be either ItemStateEnum.ACTIVE or "
-            err += "ItemStateEnum.INACTIVE"
+            err += "ItemStateEnum.INACTIVE or ItemStateEnum.DELETED"
             self.assertEqual(str(e), err)
         else:
             self.fail("Expected pybrightcove.exceptions.PyBrightcoveError.")
@@ -596,3 +593,20 @@ class VideoTest(unittest.TestCase):
                 "Video.video_full_length must be of type Rendition")
         else:
             self.fail("Expected pybrightcove.exceptions.PyBrightcoveError.")
+
+    def test_ensure_essential_fields(self):
+
+        essentials = ["creationDate", "economics", "id",
+                      "lastModifiedDate", "length", "linkText",
+                      "linkURL", "longDescription", "name",
+                      "playsTotal", "playsTrailingWeek",
+                      "publishedDate", "referenceId",
+                      "shortDescription"]
+
+        kwargs = pybrightcove.video.Video.ensure_essential_fields(**{})
+        self.assertEqual(kwargs, {})
+        kwargs = {'video_fields': ['itemState', ]}
+        kwargs = pybrightcove.video.Video.ensure_essential_fields(**kwargs)
+        for key in essentials:
+            self.assertTrue(key in kwargs['video_fields'])
+        self.assertTrue('itemState' in kwargs['video_fields'])

@@ -56,7 +56,6 @@ class PlaylistTest(unittest.TestCase):
 
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_instantiate_new(self, ConnectionMock):
-        m = ConnectionMock()
         pl = playlist.Playlist(name='My Playlist', type=enums.PlaylistTypeEnum.EXPLICIT)
         pl.video_ids = TEST_VIDEO_IDS
         self.assertEquals(pl.id, None)
@@ -82,7 +81,7 @@ class PlaylistTest(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_instantiate_with_invalid_parameters(self, ConnectionMock):
         try:
-            pl = playlist.Playlist(name="No type specified")
+            playlist.Playlist(name="No type specified")
             self.fail('Should have raised an error.')
         except exceptions.PyBrightcoveError, e:
             self.assertEquals(str(e), 'Invalid parameters for Playlist.')
@@ -125,7 +124,6 @@ class PlaylistTest(unittest.TestCase):
         self.assertEquals(m.method_calls[0][1][0], 'find_playlist_by_id')
         self.assertEquals(m.method_calls[1][0], 'post')
         self.assertEquals(m.method_calls[1][1][0], 'update_playlist')
-        
 
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_delete(self, ConnectionMock):
@@ -158,7 +156,6 @@ class PlaylistTest(unittest.TestCase):
         self.assertEquals(m.method_calls[0][0], 'get_list')
         self.assertEquals(m.method_calls[0][1][0], 'find_playlists_by_ids')
         self.assertEquals(m.method_calls[0][2]['playlist_ids'], ','.join([str(x) for x in TEST_PLAYLIST_IDS]))
-        
 
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_find_by_reference_ids(self, ConnectionMock):
@@ -190,5 +187,16 @@ class PlaylistTest(unittest.TestCase):
             print pl
         self.assertEquals(m.method_calls[0][0], 'get_list')
         self.assertEquals(m.method_calls[0][1][0], 'find_all_playlists')
-        
-        
+
+    def test_ensure_essential_fields(self):
+
+        essentials = ['id', 'referenceId', 'name', 'shortDescription',
+                      'thumbnailURL', 'videoIds', 'playlistType']
+
+        kwargs = playlist.Playlist.ensure_essential_fields(**{})
+        self.assertEqual(kwargs, {})
+        kwargs = {'playlist_fields': ['itemState', ]}
+        kwargs = playlist.Playlist.ensure_essential_fields(**kwargs)
+        for key in essentials:
+            self.assertTrue(key in kwargs['playlist_fields'])
+        self.assertTrue('itemState' in kwargs['playlist_fields'])
