@@ -52,6 +52,7 @@ class Playlist(object):
         self.videos = []
         self.video_ids = []
         self.type = None
+        self.tags = []
 
         self.raw_data = None
 
@@ -111,11 +112,16 @@ class Playlist(object):
         """
         Internal method that serializes object into a dictionary.
         """
+        for i, tag in enumerate(self.tags):
+            if tag in ("", None):
+                self.tags.pop(i)
+
         data = {
             'name': self.name,
             'referenceId': self.reference_id,
             'shortDescription': self.short_description,
             'playlistType': self.type,
+            'tags': self.tags,
             'id': self.id}
         if self.videos:
             for video in self.videos:
@@ -140,6 +146,9 @@ class Playlist(object):
         self.videos = []
         self.video_ids = data['videoIds']
         self.type = data['playlistType']
+        self.tags = []
+        for tag in data['filterTags']:
+            self.tags.append(tag)
 
         for video in data.get('videos', []):
             self.videos.append(pybrightcove.video.Video(

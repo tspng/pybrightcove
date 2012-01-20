@@ -436,6 +436,9 @@ class Video(object):
         self.tags = []
         for tag in data['tags']:
             self.tags.append(tag)
+        self.renditions = []
+        for r in data['renditions']:
+            self.renditions.append(Rendition(data=r))
         self.thumbnail_url = data['thumbnailURL']
         self.video_still_url = data['videoStillURL']
 
