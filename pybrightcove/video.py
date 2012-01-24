@@ -433,12 +433,8 @@ class Video(object):
         self.item_state = data.get('itemState', None)
         self.reference_id = data['referenceId']
         self.short_description = data['shortDescription']
-        self.tags = []
-        for tag in data['tags']:
-            self.tags.append(tag)
-        self.renditions = []
-        for r in data['renditions']:
-            self.renditions.append(Rendition(data=r))
+        self.tags = [tag for tag in data.get('tags', [])]
+        self.renditions = [Rendition(r) for r in data.get('renditions', [])]
         self.thumbnail_url = data['thumbnailURL']
         self.video_still_url = data['videoStillURL']
 
