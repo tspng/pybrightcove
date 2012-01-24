@@ -616,6 +616,29 @@ class VideoTest(unittest.TestCase):
 
 class TestVideoRenditions(unittest.TestCase):
 
+    def setUp(self):
+        self.video_data =  {
+                            'creationDate'      : 1272312315.0,
+                            'economics'         : enums.EconomicsEnum.FREE,
+                            'id'                : TEST_VIDEO_ID,
+                            'lastModifiedDate'  : 1272312315.0,
+                            'length'            : 55,
+                            'linkText'          : "the link text",
+                            'linkURL'           : "the link url",
+                            'longDescription'   : "A really long description.",
+                            'name'              : "My Video",
+                            'playsTotal'        : 100,
+                            'playsTrailingWeek' : 40,
+                            'publishedDate'     : 1272312315.0,
+                            'startDate'         : 1272312315.0,
+                            'endDate'           : 1272312315.0,
+                            'referenceId'       : TEST_VIDEO_REF_ID,
+                            'shortDescription'  : "this is a short description",
+                            'tags'              : ['tag1', 'tag2', 'tag3'],
+                            'thumbnailURL'      : 'another_something_url',
+                            'videoStillURL'     : 'something_url'
+        }
+
     def get_fake_rendition(self, **kw):
         url = 'http://brightcove.vo.llnwd.net/d11/unsecured/media/1345087319/1345087319_96280142001_MOV08442.mp4'
         fake_rendition = {}
@@ -633,24 +656,24 @@ class TestVideoRenditions(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_video_with_no_renditions(self, ConnectionMock):
         """ if JSON data has no renditions, be OK with it """
-        VIDEO_DATA['renditions'] = []
+        self.video_data['renditions'] = []
         m = ConnectionMock()
-        m.get_item.return_value = VIDEO_DATA
+        m.get_item.return_value = self.video_data
         m.post.return_value = 10
 
-        video = Video(data=VIDEO_DATA, _connection=m)
+        video = Video(data=self.video_data, _connection=m)
 
         self.assertEqual(video.renditions, [])
 
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_video_with_renditions(self, ConnectionMock):
         """ if JSON data has renditions, import them properly"""
-        VIDEO_DATA['renditions'] = [ self.get_fake_rendition() for i in range(0,4)]
+        self.video_data['renditions'] = [ self.get_fake_rendition() for i in range(0,4)]
         m = ConnectionMock()
-        m.get_item.return_value = VIDEO_DATA
+        m.get_item.return_value = self.video_data
         m.post.return_value = 10
 
-        video = Video(data=VIDEO_DATA, _connection=m)
+        video = Video(data=self.video_data, _connection=m)
         rendition = video.renditions[0]
 
         self.assertEqual(len(video.renditions), 4)
