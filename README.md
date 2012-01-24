@@ -22,6 +22,6 @@ Note how the name is dotless. To actually start running the tests you can call
 either in the current directory or lower in the directory tree.
 
 If you are using Vim as your text editor, you can also install
-[`pytest.vim](http://www.vim.org/scripts/script.php?script_id=3424) which
+[`pytest.vim`](http://www.vim.org/scripts/script.php?script_id=3424) which
 allows you to run tests from the editor without needing to go back to the
 terminal.
