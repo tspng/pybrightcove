@@ -82,10 +82,10 @@ class FTPVideoTest(unittest.TestCase):
         self.assertEqual('storbinary', f.method_calls[8][0])
         self.assertEqual('STOR poster.png', f.method_calls[8][1][0])
 
-        self.assertEqual('write', fd.method_calls[2][0])
+        self.assertEqual(fd.method_calls[0][0], 'write')
         valid_xml = minidom.parse(
             open(os.path.join(os.path.dirname(__file__), 'test_ftp_video_batch_provision_manifest.xml'), 'rb'))
-        test_xml = minidom.parseString(fd.method_calls[2][1][0])
+        test_xml = minidom.parseString(fd.method_calls[0][1][0])
         self.assertEqual(
             valid_xml.toxml().replace('\t', '').replace('\n', ''),
             test_xml.toxml().replace('\t', '').replace('\n', ''))
