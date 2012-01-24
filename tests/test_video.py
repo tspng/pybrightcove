@@ -25,6 +25,8 @@ import unittest
 import uuid
 from datetime import datetime, timedelta
 import pybrightcove
+from pybrightcove import enums
+from pybrightcove.video import Video
 import mock
 ## NOTE: This are ids private to my account, if you want to run these tests
 ##       for yourself and have them pass, replace these with your own values.
@@ -34,7 +36,7 @@ TEST_VIDEO_REF_ID = 'SN-47314834-100808-ATLGA-SV-404693da06d38.mp4'
 TEST_VIDEO_REF_IDS = ['unittest-1', 'unittest-2', TEST_VIDEO_REF_ID]
 VIDEO_DATA = {
     'creationDate': 1272312315.0,
-    'economics': pybrightcove.enums.EconomicsEnum.FREE,
+    'economics': enums.EconomicsEnum.FREE,
     'id': TEST_VIDEO_ID,
     'lastModifiedDate': 1272312315.0,
     'length': 55,
@@ -136,7 +138,7 @@ class VideoTest(unittest.TestCase):
 
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_instantiate_new(self, ConnectionMock):
-        video = pybrightcove.video.Video(filename='/mnt/local/movie.mov', name='My Movie',
+        video = Video(filename='/mnt/local/movie.mov', name='My Movie',
             short_description='This is my movie.')
         self.assertEquals(video.id, None)
         self.assertEquals(video.name, 'My Movie')
@@ -148,7 +150,7 @@ class VideoTest(unittest.TestCase):
     def test_instantiate_with_video_id(self, ConnectionMock):
         m = ConnectionMock()
         m.get_item.return_value = VIDEO_DATA
-        video = pybrightcove.video.Video(id=TEST_VIDEO_ID)
+        video = Video(id=TEST_VIDEO_ID)
         self.assertEquals(video.reference_id, TEST_VIDEO_REF_ID)
         self.assertEquals(m.method_calls[0][0], 'get_item')
         self.assertEquals(m.method_calls[0][1][0], 'find_video_by_id')
@@ -158,7 +160,7 @@ class VideoTest(unittest.TestCase):
     def test_instantiate_with_reference_id(self, ConnectionMock):
         m = ConnectionMock()
         m.get_item.return_value = VIDEO_DATA
-        video = pybrightcove.video.Video(reference_id=TEST_VIDEO_REF_ID)
+        video = Video(reference_id=TEST_VIDEO_REF_ID)
         self.assertEquals(video.id, TEST_VIDEO_ID)
         self.assertEquals(m.method_calls[0][0], 'get_item')
         self.assertEquals(m.method_calls[0][1][0], 'find_video_by_reference_id')
@@ -167,9 +169,9 @@ class VideoTest(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_instantiate_with_invalid_parameters(self, ConnectionMock):
         try:
-            pybrightcove.video.Video(name='This is wrong.')
+            Video(name='This is wrong.')
             self.fail('Should not have worked, but rather raised an error.')
-            pybrightcove.video.Video()
+            Video()
             self.fail('Should not have worked, but rather raised an error.')
         except pybrightcove.exceptions.PyBrightcoveError, e:
             self.assertEquals(str(e), 'Invalid parameters for Video.')
@@ -180,7 +182,7 @@ class VideoTest(unittest.TestCase):
     def test_save_new(self, ConnectionMock):
         m = ConnectionMock()
         m.post.return_value = 10
-        video = pybrightcove.video.Video(filename='bears.mov', name='The Bears',
+        video = Video(filename='bears.mov', name='The Bears',
             short_description='Opening roll for an exciting soccer match.')
         video.tags.append('unittest')
         self.assertEquals(video.id, None)
@@ -188,6 +190,18 @@ class VideoTest(unittest.TestCase):
         self.assertEquals(video.id, 10)
         self.assertEquals(m.method_calls[0][0], 'post')
         self.assertEquals(m.method_calls[0][1][0], 'create_video')
+
+    @mock.patch('pybrightcove.connection.APIConnection')
+    def test_video_with_no_renditions(self, ConnectionMock):
+        """ if JSON data has no renditions, be OK with it """
+        VIDEO_DATA['renditions'] = []
+        m = ConnectionMock()
+        m.get_item.return_value = VIDEO_DATA
+        m.post.return_value = 10
+
+        video = Video(data=VIDEO_DATA, _connection=m)
+        
+        self.assertEqual(video.renditions, [])
 
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_save_new_with_renditions(self, ConnectionMock):
@@ -216,7 +230,7 @@ class VideoTest(unittest.TestCase):
         r.video_codec = pybrightcove.enums.VideoCodecEnum.H264
         renditions.append(r)
 
-        video = pybrightcove.video.Video(name='The Bears', renditions=renditions,
+        video = Video(name='The Bears', renditions=renditions,
             short_description='Opening roll for an exciting soccer match.')
         video.tags.append('unittest')
 
@@ -248,7 +262,7 @@ class VideoTest(unittest.TestCase):
     def test_save_new_with_metadata(self, ConnectionMock):
         m = ConnectionMock()
         m.post.return_value = TEST_VIDEO_ID
-        video = pybrightcove.video.Video(filename='bears.mov', name='The Bears',
+        video = Video(filename='bears.mov', name='The Bears',
             short_description='Opening roll for an exciting soccer match.')
         video.tags.append('unittest')
         self.assertEquals(video.id, None)
@@ -270,7 +284,7 @@ class VideoTest(unittest.TestCase):
         m = ConnectionMock()
         m.post.return_value = VIDEO_DATA
         m.get_item.return_value = VIDEO_DATA
-        video = pybrightcove.video.Video(id=TEST_VIDEO_ID)
+        video = Video(id=TEST_VIDEO_ID)
         video.tags.append('tag-%s' % self.test_uuid)
         video.tags.append('unittest')
         self.assertEquals(video.id, TEST_VIDEO_ID)
@@ -288,7 +302,7 @@ class VideoTest(unittest.TestCase):
         m = ConnectionMock()
         m.post.return_value = VIDEO_DATA
         m.get_item.return_value = VIDEO_DATA
-        video = pybrightcove.video.Video(id=TEST_VIDEO_ID)
+        video = Video(id=TEST_VIDEO_ID)
         video.tags.append('tag-%s' % self.test_uuid)
         video.tags.append('unittest')
         video.add_custom_metadata('genre', 'Sci-Fi', 'string')
@@ -313,7 +327,7 @@ class VideoTest(unittest.TestCase):
         m = ConnectionMock()
         m.post.return_value = pybrightcove.enums.UploadStatusEnum.PROCESSING
         m.get_item.return_value = VIDEO_DATA
-        video = pybrightcove.video.Video(id=TEST_VIDEO_ID)
+        video = Video(id=TEST_VIDEO_ID)
         status = video.get_upload_status()
         self.assertEquals(status, pybrightcove.enums.UploadStatusEnum.PROCESSING)
         self.assertEquals(m.method_calls[0][0], 'get_item')
@@ -325,7 +339,7 @@ class VideoTest(unittest.TestCase):
     def test_delete(self, ConnectionMock):
         m = ConnectionMock()
         m.get_item.return_value = VIDEO_DATA
-        video = pybrightcove.video.Video(id=TEST_VIDEO_ID)
+        video = Video(id=TEST_VIDEO_ID)
         video.delete()
         self.assertEquals(m.method_calls[0][0], 'get_item')
         self.assertEquals(m.method_calls[1][0], 'post')
@@ -340,7 +354,7 @@ class VideoTest(unittest.TestCase):
         m = ConnectionMock()
         m.post.return_value = IMAGE_DATA
         m.get_item.return_value = VIDEO_DATA
-        video = pybrightcove.video.Video(id=TEST_VIDEO_ID)
+        video = Video(id=TEST_VIDEO_ID)
         video.set_image(image, filename="IMG_0050.JPG")
         self.assertEquals(m.method_calls[0][0], 'get_item')
         self.assertEquals(m.method_calls[1][0], 'post')
@@ -351,7 +365,7 @@ class VideoTest(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_find_by_tags(self, ConnectionMock):
         m = self._get_list_mock(ConnectionMock)
-        videos = pybrightcove.video.Video.find_by_tags(and_tags=['unittest', 'two'])
+        videos = Video.find_by_tags(and_tags=['unittest', 'two'])
         for video in videos:
             print video  # self.assertEquals(type(video), Video)
         print m.method_calls
@@ -362,7 +376,7 @@ class VideoTest(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_find_by_text(self, ConnectionMock):
         m = self._get_list_mock(ConnectionMock)
-        videos = pybrightcove.video.Video.find_by_text('bear')
+        videos = Video.find_by_text('bear')
         for video in videos:
             print video  # self.assertEquals(type(video), Video)
         print m.method_calls
@@ -373,7 +387,7 @@ class VideoTest(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_find_by_campaign(self, ConnectionMock):
         m = self._get_list_mock(ConnectionMock)
-        videos = pybrightcove.video.Video.find_by_campaign(988756758)
+        videos = Video.find_by_campaign(988756758)
         for video in videos:
             print video  # self.assertEquals(type(video), Video)
         print m.method_calls
@@ -384,7 +398,7 @@ class VideoTest(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_find_by_user(self, ConnectionMock):
         m = self._get_list_mock(ConnectionMock)
-        videos = pybrightcove.video.Video.find_by_user(12312431)
+        videos = Video.find_by_user(12312431)
         for video in videos:
             print video  # self.assertEquals(type(video), Video)
         print m.method_calls
@@ -395,7 +409,7 @@ class VideoTest(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_find_by_reference_ids(self, ConnectionMock):
         m = self._get_list_mock(ConnectionMock)
-        videos = pybrightcove.video.Video.find_by_reference_ids(TEST_VIDEO_REF_IDS)
+        videos = Video.find_by_reference_ids(TEST_VIDEO_REF_IDS)
         for video in videos:
             print video  # self.assertEquals(type(video), Video)
         print m.method_calls
@@ -403,7 +417,7 @@ class VideoTest(unittest.TestCase):
         self.assertEquals(m.method_calls[0][1][0], 'find_videos_by_reference_ids')
         self.assertEquals(m.method_calls[0][2]['reference_ids'], ','.join([str(x) for x in TEST_VIDEO_REF_IDS]))
 
-        videos = pybrightcove.video.Video.find_by_reference_ids(TEST_VIDEO_REF_IDS, unfiltered=True)
+        videos = Video.find_by_reference_ids(TEST_VIDEO_REF_IDS, unfiltered=True)
         for video in videos:
             print video  # self.assertEquals(type(video), Video)
         print m.method_calls
@@ -414,7 +428,7 @@ class VideoTest(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_find_by_ids(self, ConnectionMock):
         m = self._get_list_mock(ConnectionMock)
-        videos = pybrightcove.video.Video.find_by_ids(TEST_VIDEO_IDS)
+        videos = Video.find_by_ids(TEST_VIDEO_IDS)
         for video in videos:
             print video  # self.assertEquals(type(video), Video)
         print m.method_calls
@@ -422,7 +436,7 @@ class VideoTest(unittest.TestCase):
         self.assertEquals(m.method_calls[0][1][0], 'find_videos_by_ids')
         self.assertEquals(m.method_calls[0][2]['video_ids'], ','.join([str(x) for x in TEST_VIDEO_IDS]))
 
-        videos = pybrightcove.video.Video.find_by_ids(TEST_VIDEO_IDS, unfiltered=True)
+        videos = Video.find_by_ids(TEST_VIDEO_IDS, unfiltered=True)
         for video in videos:
             print video  # self.assertEquals(type(video), Video)
         print m.method_calls
@@ -433,7 +447,7 @@ class VideoTest(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_find_by_id(self, ConnectionMock):
         m = self._get_item_mock(ConnectionMock)
-        video = pybrightcove.video.Video(id=TEST_VIDEO_IDS[0])
+        video = Video(id=TEST_VIDEO_IDS[0])
         print video  # self.assertEquals(type(video), Video)
         print m.method_calls
         self.assertEquals(m.method_calls[0][0], 'get_item')
@@ -442,7 +456,7 @@ class VideoTest(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_get_metadata(self, ConnectionMock):
         m = self._get_item_mock(ConnectionMock)
-        video = pybrightcove.video.Video(id=TEST_VIDEO_IDS[0])
+        video = Video(id=TEST_VIDEO_IDS[0])
         m.get_item.return_value = {"customFields": {"sample": "title"}}
         video.get_custom_metadata()
         print video  # self.assertEquals(type(video), Video)
@@ -458,7 +472,7 @@ class VideoTest(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_find_all(self, ConnectionMock):
         m = self._get_list_mock(ConnectionMock)
-        videos = pybrightcove.video.Video.find_all()
+        videos = Video.find_all()
         for video in videos:
             print video  # self.assertEquals(type(video), Video)
         print m.method_calls
@@ -469,7 +483,7 @@ class VideoTest(unittest.TestCase):
     def test_find_related(self, ConnectionMock):
         m = self._get_list_mock(ConnectionMock)
         m.get_item.return_value = VIDEO_DATA
-        video = pybrightcove.video.Video(id=TEST_VIDEO_ID)
+        video = Video(id=TEST_VIDEO_ID)
         for related_video in video.find_related():
             print related_video  # self.assertEquals(type(related_video), Video)
         print m.method_calls
@@ -481,7 +495,7 @@ class VideoTest(unittest.TestCase):
     def test_find_modified_unfiltered(self, ConnectionMock):
         m = self._get_list_mock(ConnectionMock)
         yesterday = datetime.now() - timedelta(days=1)
-        videos = pybrightcove.video.Video.find_modified(since=yesterday)
+        videos = Video.find_modified(since=yesterday)
         for video in videos:
             print video  # self.assertEquals(type(video), Video)
         print m.method_calls
@@ -495,7 +509,7 @@ class VideoTest(unittest.TestCase):
         yesterday = datetime.now() - timedelta(days=1)
         filters = [pybrightcove.enums.FilterChoicesEnum.PLAYABLE,
             pybrightcove.enums.FilterChoicesEnum.DELETED]
-        videos = pybrightcove.video.Video.find_modified(since=yesterday, filter_list=filters)
+        videos = Video.find_modified(since=yesterday, filter_list=filters)
         for video in videos:
             print video  # self.assertEquals(type(video), Video)
         self.assertEquals(m.method_calls[0][0], 'get_list')
@@ -506,7 +520,7 @@ class VideoTest(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_invalid_name(self, ConnectionMock):
         try:
-            pybrightcove.video.Video(name="Name is too long" * 20,
+            Video(name="Name is too long" * 20,
                           short_description="ok desc",
                           filename="somefile.mov")
         except pybrightcove.exceptions.PyBrightcoveError, e:
@@ -518,7 +532,7 @@ class VideoTest(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_invalid_short_description(self, ConnectionMock):
         try:
-            pybrightcove.video.Video(name="Name is too long",
+            Video(name="Name is too long",
                           short_description="ok desc" * 100,
                           filename="somefile.mov")
         except pybrightcove.exceptions.PyBrightcoveError, e:
@@ -530,7 +544,7 @@ class VideoTest(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_invalid_long_description(self, ConnectionMock):
         try:
-            video = pybrightcove.video.Video(name="Name is too long",
+            video = Video(name="Name is too long",
                           short_description="ok desc",
                           filename="somefile.mov")
             video.long_description = "Very long" * 5000
@@ -543,7 +557,7 @@ class VideoTest(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_invalid_reference_id(self, ConnectionMock):
         try:
-            video = pybrightcove.video.Video(name="Name is too long",
+            video = Video(name="Name is too long",
                           short_description="ok desc",
                           filename="somefile.mov")
             video.reference_id = "long ref id" * 100
@@ -556,7 +570,7 @@ class VideoTest(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_invalid_economics(self, ConnectionMock):
         try:
-            video = pybrightcove.video.Video(name="Name is too long",
+            video = Video(name="Name is too long",
                           short_description="ok desc",
                           filename="somefile.mov")
             video.economics = "The Keynesian view is Wrong"
@@ -570,7 +584,7 @@ class VideoTest(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_invalid_item_state(self, ConnectionMock):
         try:
-            video = pybrightcove.video.Video(name="Name is too long",
+            video = Video(name="Name is too long",
                           short_description="ok desc",
                           filename="somefile.mov")
             video.item_state = "Invalid"
@@ -584,7 +598,7 @@ class VideoTest(unittest.TestCase):
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_invalid_video_full_length(self, ConnectionMock):
         try:
-            video = pybrightcove.video.Video(name="Name is too long",
+            video = Video(name="Name is too long",
                           short_description="ok desc",
                           filename="somefile.mov")
             video.video_full_length = 10
@@ -603,10 +617,10 @@ class VideoTest(unittest.TestCase):
                       "publishedDate", "referenceId",
                       "shortDescription"]
 
-        kwargs = pybrightcove.video.Video.ensure_essential_fields(**{})
+        kwargs = Video.ensure_essential_fields(**{})
         self.assertEqual(kwargs, {})
         kwargs = {'video_fields': ['itemState', ]}
-        kwargs = pybrightcove.video.Video.ensure_essential_fields(**kwargs)
+        kwargs = Video.ensure_essential_fields(**kwargs)
         for key in essentials:
             self.assertTrue(key in kwargs['video_fields'])
         self.assertTrue('itemState' in kwargs['video_fields'])
