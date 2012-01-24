@@ -192,18 +192,6 @@ class VideoTest(unittest.TestCase):
         self.assertEquals(m.method_calls[0][1][0], 'create_video')
 
     @mock.patch('pybrightcove.connection.APIConnection')
-    def test_video_with_no_renditions(self, ConnectionMock):
-        """ if JSON data has no renditions, be OK with it """
-        VIDEO_DATA['renditions'] = []
-        m = ConnectionMock()
-        m.get_item.return_value = VIDEO_DATA
-        m.post.return_value = 10
-
-        video = Video(data=VIDEO_DATA, _connection=m)
-        
-        self.assertEqual(video.renditions, [])
-
-    @mock.patch('pybrightcove.connection.APIConnection')
     def test_save_new_with_renditions(self, ConnectionMock):
         m = ConnectionMock()
         m.post.return_value = 10
@@ -624,3 +612,52 @@ class VideoTest(unittest.TestCase):
         for key in essentials:
             self.assertTrue(key in kwargs['video_fields'])
         self.assertTrue('itemState' in kwargs['video_fields'])
+
+
+class TestVideoRenditions(unittest.TestCase):
+
+    def get_fake_rendition(self, **kw):
+        url = 'http://brightcove.vo.llnwd.net/d11/unsecured/media/1345087319/1345087319_96280142001_MOV08442.mp4'
+        fake_rendition = {}
+        fake_rendition['url'] = kw.get('url', url)
+        fake_rendition['encodingRate'] = kw.get('encoding_rate', 697000)
+        fake_rendition['frameHeight'] = kw.get('frame_height', 720)
+        fake_rendition['frameWidth'] = kw.get('frame_width', 640)
+        fake_rendition['size'] = kw.get('size', 9876543)
+        fake_rendition['remoteUrl'] = kw.get('remote_url')
+        fake_rendition['remoteStreamName'] = kw.get('remote_stream_name', None)
+        fake_rendition['videoDuration'] = kw.get('video_duration', 118434)
+        fake_rendition['videoCodec'] = kw.get('video_codec', 'H264')
+        return fake_rendition
+
+    @mock.patch('pybrightcove.connection.APIConnection')
+    def test_video_with_no_renditions(self, ConnectionMock):
+        """ if JSON data has no renditions, be OK with it """
+        VIDEO_DATA['renditions'] = []
+        m = ConnectionMock()
+        m.get_item.return_value = VIDEO_DATA
+        m.post.return_value = 10
+
+        video = Video(data=VIDEO_DATA, _connection=m)
+
+        self.assertEqual(video.renditions, [])
+
+    @mock.patch('pybrightcove.connection.APIConnection')
+    def test_video_with_renditions(self, ConnectionMock):
+        """ if JSON data has renditions, import them properly"""
+        VIDEO_DATA['renditions'] = [ self.get_fake_rendition() for i in range(0,4)]
+        m = ConnectionMock()
+        m.get_item.return_value = VIDEO_DATA
+        m.post.return_value = 10
+
+        video = Video(data=VIDEO_DATA, _connection=m)
+        rendition = video.renditions[0]
+
+        self.assertEqual(len(video.renditions), 4)
+        self.assertEqual(rendition.frame_width, 640)
+        self.assertEqual(rendition.frame_height, 720)
+        self.assertEqual(rendition.encoding_rate, 697000)
+        self.assertEqual(rendition.size, 9876543)
+        self.assertEqual(rendition.video_duration, 118434)
+        self.assertEqual(rendition.video_codec, 'H264')
+        self.assertTrue('http://bright' in rendition.url)
