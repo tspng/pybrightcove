@@ -146,9 +146,7 @@ class Playlist(object):
         self.videos = []
         self.video_ids = data['videoIds']
         self.type = data['playlistType']
-        self.tags = []
-        for tag in data['filterTags']:
-            self.tags.append(tag)
+        self.tags = [tag for tag in data.get('filterTags', [])]
 
         for video in data.get('videos', []):
             self.videos.append(pybrightcove.video.Video(
