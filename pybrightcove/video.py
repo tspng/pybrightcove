@@ -116,7 +116,6 @@ class Rendition(object):
     """
 
     def __init__(self, data=None):
-        print data
         self.url = None
         self.encoding_rate = None
         self.frame_height = None
