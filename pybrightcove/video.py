@@ -132,7 +132,10 @@ class Rendition(object):
             self.frame_height = data.get('frameHeight', None)
             self.frame_width = data.get('frameWidth', None)
             self.size = data['size']
-            self.remote_url = data['remoteUrl']
+            if data['remoteUrl']:
+                self.remote_url = data['remoteUrl']
+            else:
+                self.remote_url = self.url
             self.remote_stream_name = data.get('remoteStreamName', None)
             self.video_duration = data['videoDuration']
             self.video_codec = data['videoCodec']
