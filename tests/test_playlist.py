@@ -200,3 +200,38 @@ class PlaylistTest(unittest.TestCase):
         for key in essentials:
             self.assertTrue(key in kwargs['playlist_fields'])
         self.assertTrue('itemState' in kwargs['playlist_fields'])
+
+
+class PlaylistTypeTest(unittest.TestCase):
+
+    def setUp(self):
+        # Get all valid types
+        self.types = [type for type in dir(enums.PlaylistTypeEnum) if type[0] != '_']
+        # and one invalid type
+        self.invalid_type = "INVALID_PLAYLIST_TYPE"
+
+        # Setup test data
+        self.test_data = {
+            'id': 111, 'referenceId': None, 'name': 'Test Playlist Types',
+            'shortDescription': None, 'videoIds': [], 'thumbnailURL': None,
+            'playlistType': self.invalid_type
+        }
+
+    @mock.patch('pybrightcove.connection.APIConnection')
+    def test_import_invalid_type(self, ConnectionMock):
+        # Importing playlist data that includes an invalid playlist type
+        # raises an error.
+        self.assertRaises(
+            exceptions.PyBrightcoveError,
+            playlist.Playlist,
+            **{'data': self.test_data, '_connection': ConnectionMock()}
+        )
+
+    @mock.patch('pybrightcove.connection.APIConnection')
+    def test_all_api_version_5_playlist_types(self, ConnectionMock):
+        # Valid types should not raise any errors
+        for type in self.types:
+            self.test_data['playlistType'] = type
+
+            pl = playlist.Playlist(data=self.test_data, _connection=ConnectionMock())
+            self.assertEqual(pl.type, type)
