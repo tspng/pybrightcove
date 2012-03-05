@@ -217,6 +217,7 @@ class PlaylistTypeTest(unittest.TestCase):
             'playlistType': self.invalid_type
         }
 
+    @mock.patch('pybrightcove.connection.APIConnection')
     def test_import_invalid_type(self, ConnectionMock):
         # Importing playlist data that includes an invalid playlist type
         # raises an error.
@@ -224,7 +225,7 @@ class PlaylistTypeTest(unittest.TestCase):
         self.assertRaises(
             exceptions.PyBrightcoveError,
             playlist.Playlist,
-            **{'data': self.test_data}
+            **{'data': self.test_data, '_connection': ConnectionMock()}
         )
 
     @mock.patch('pybrightcove.connection.APIConnection')
@@ -241,5 +242,5 @@ class PlaylistTypeTest(unittest.TestCase):
         for type in self.types:
             self.test_data['playlistType'] = type
 
-            pl = playlist.Playlist(data=self.test_data)
+            pl = playlist.Playlist(data=self.test_data, _connection=ConnectionMock())
             self.assertEqual(pl.type, type)
