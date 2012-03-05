@@ -221,7 +221,6 @@ class PlaylistTypeTest(unittest.TestCase):
     def test_import_invalid_type(self, ConnectionMock):
         # Importing playlist data that includes an invalid playlist type
         # raises an error.
-        # aaronmccall: 
         self.assertRaises(
             exceptions.PyBrightcoveError,
             playlist.Playlist,
@@ -230,15 +229,7 @@ class PlaylistTypeTest(unittest.TestCase):
 
     @mock.patch('pybrightcove.connection.APIConnection')
     def test_all_api_version_5_playlist_types(self, ConnectionMock):
-
-        # This should raise an error because we have an invalid playlist type
-#            try:
-#
-#                self.fail("Should have raised an error.")
-#            except exceptions.PyBrightcoveError, e:
-#                self.assertEqual(str(e), "Playlist.type must be a valid PlaylistTypeEnum")
-
-
+        # Valid types should not raise any errors
         for type in self.types:
             self.test_data['playlistType'] = type
 
