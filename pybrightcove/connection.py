@@ -210,18 +210,41 @@ class APIConnection(Connection):
                     result['error'])
             return result['result']
 
-    def _get_response(self, **kwargs):
-        """
-        Make the GET request.
-        """
-        # pylint: disable=E1101
-        url = self.read_url + "?output=JSON&token=%s" % self.read_token
+    def _get_find_url_params(self, **kwargs):
+        url = ''
         for key in kwargs:
             if key and kwargs[key]:
                 val = kwargs[key]
                 if isinstance(val, (list, tuple)):
                     val = ",".join(val)
                 url += "&%s=%s" % (key, val)
+        return url
+
+    def _get_search_url_params(self, **kwargs):
+        # Build url paramters for new style search_videos method, as described
+        # on http://support.brightcove.com/en/docs/searching-videos-media-api
+        url = ''
+        for key in kwargs:
+            if key and kwargs[key]:
+                val = kwargs[key]
+                if isinstance(val, (list, tuple)):
+                    params = "&".join(["%s=%s" % (key, v) for v in val])
+                    url += "&%s" % params
+                else:
+                    url += "&%s=%s" % (key, val)
+        return url
+
+    def _get_response(self, **kwargs):
+        """
+        Make the GET request.
+        """
+        # pylint: disable=E1101
+        url = self.read_url + "?output=JSON&token=%s" % self.read_token
+        if kwargs.get('command') == 'search_videos':
+            # must be different ...
+            url += self._get_search_url_params(**kwargs)
+        else:
+            url += self._get_find_url_params(**kwargs)
         self._api_url = url
         req = urllib2.urlopen(url)
         data = simplejson.loads(req.read())

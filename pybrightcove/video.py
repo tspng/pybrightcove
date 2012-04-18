@@ -69,7 +69,7 @@ class Image(object):
 
     For more information, see Adding Images to Videos with the Media API [1].
 
-    [1] http://help.brightcove.com/developer/docs/mediaapi/add_image.cfm
+    [1] http://support.brightcove.com/en/docs/adding-images-videos-media-api
     """
 
     def __init__(self, data=None, **kwargs):
@@ -614,7 +614,7 @@ class Video(object):
 
     def set_image(self, image, filename=None, resize=False):
         """
-        Set the poster or thumbnail of a this Vidoe.
+        Set the poster or thumbnail of a this Video.
         """
         if self.id:
             data = self.connection.post('add_image', filename,
@@ -747,46 +747,6 @@ class Video(object):
             and_tags=atags, or_tags=otags, **kwargs)
 
     @staticmethod
-    def find_by_text(text, _connection=None, page_size=100, page_number=0,
-                     sort_by=enums.DEFAULT_SORT_BY,
-                     sort_order=enums.DEFAULT_SORT_ORDER,
-                     **kwargs):
-        """
-        List videos that match the ``text`` in title or description.
-        """
-        kwargs = Video.ensure_essential_fields(**kwargs)
-        return connection.ItemResultSet('find_videos_by_text',
-            Video, _connection, page_size, page_number, sort_by, sort_order,
-            text=text, **kwargs)
-
-    @staticmethod
-    def find_by_campaign(campaign_id, _connection=None, page_size=100,
-                         page_number=0, sort_by=enums.DEFAULT_SORT_BY,
-                         sort_order=enums.DEFAULT_SORT_ORDER,
-                         **kwargs):
-        """
-        List all videos for a given campaign.
-        """
-        kwargs = Video.ensure_essential_fields(**kwargs)
-        return connection.ItemResultSet(
-            'find_videos_by_campaign_id', Video, _connection, page_size,
-            page_number, sort_by, sort_order, campaign_id=campaign_id,
-            **kwargs)
-
-    @staticmethod
-    def find_by_user(user_id, _connection=None, page_size=100, page_number=0,
-                     sort_by=enums.DEFAULT_SORT_BY,
-                     sort_order=enums.DEFAULT_SORT_ORDER,
-                     **kwargs):
-        """
-        List all videos uploaded by a certain user.
-        """
-        kwargs = Video.ensure_essential_fields(**kwargs)
-        return connection.ItemResultSet('find_videos_by_user_id',
-            Video, _connection, page_size, page_number, sort_by, sort_order,
-            user_id=user_id, **kwargs)
-
-    @staticmethod
     def find_by_reference_ids(reference_ids, _connection=None, page_size=100,
                               page_number=0, sort_by=enums.DEFAULT_SORT_BY,
                               sort_order=enums.DEFAULT_SORT_ORDER,
@@ -824,3 +784,17 @@ class Video(object):
         return connection.ItemResultSet(apicall,
             Video, _connection, page_size, page_number, sort_by, sort_order,
             video_ids=ids, **kwargs)
+
+    @staticmethod
+    def search(all=None, any=None, none=None,
+        _connection=None, page_size=100, page_number=0,
+        sort_by=enums.DEFAULT_SORT_BY, sort_order=enums.DEFAULT_SORT_ORDER,
+        **kwargs):
+        """
+        Search for videos using various lookup parameters.
+        See: http://support.brightcove.com/en/docs/searching-videos-media-api
+        """
+        kwargs = Video.ensure_essential_fields(**kwargs)
+        return connection.ItemResultSet('search_videos',
+            Video, _connection, page_size, page_number, sort_by, sort_order,
+            all=all, any=any, none=none, **kwargs)
