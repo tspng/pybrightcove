@@ -274,7 +274,6 @@ class APIConnection(Connection):
             file_handle.close()
             params['file_checksum'] = md5.hexdigest()
         data['params'] = params
-
         return self._post(data=data, file_to_upload=file_to_upload)
 
     def get_list(self, command, item_class, page_size, page_number, sort_by,

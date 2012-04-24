@@ -253,6 +253,7 @@ class Video(object):
         self.link_url = None
         self.link_text = None
         self.tags = []
+        self.ad_keys = {}
         self.video_still_url = None
         self.thumbnail_url = None
         self.length = None
@@ -335,6 +336,9 @@ class Video(object):
             'id': self.id,
             'endDate': _make_tstamp(self.end_date),
             'startDate': _make_tstamp(self.start_date)}
+        if len(self.ad_keys) > 0:
+            data['adKeys'] = ';'.join(["%s=%s" % (key, self.ad_keys[key]) 
+                for key in self.ad_keys])
         if len(self.renditions) > 0:
             data['renditions'] = []
             for r in self.renditions:
@@ -402,6 +406,7 @@ class Video(object):
             xml += '</long-description>\n'
         for tag in self.tags:
             xml += '<tag><![CDATA[%s]]></tag>\n' % tag
+        # TODO: ad keys
         for asset in self.assets:
             if asset.get('encoding-rate', None):
                 xml += '<rendition-refid>%s</rendition-refid>\n' % \
@@ -440,6 +445,10 @@ class Video(object):
         self.renditions = [Rendition(r) for r in data.get('renditions', [])]
         self.thumbnail_url = data['thumbnailURL']
         self.video_still_url = data['videoStillURL']
+        if data.get('adKeys') and len(data.get('adKeys')) > 0:
+            for ak in data.get('adKeys').split(';'):
+                key, val = ak.split('=')
+                self.ad_keys[key] = val
 
     def __setattr__(self, name, value):
         msg = None
